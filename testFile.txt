@@ -1,0 +1,4 @@
+This file was created in the Jetson Device to check local git working
+This will be pushed to the local GIT_SERVER
+That will then be pulled to the laptop and added to the github repository
+
