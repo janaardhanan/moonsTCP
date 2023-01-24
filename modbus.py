@@ -98,36 +98,32 @@ def stopJog():
 def readAlarm(ids):
     #val1= readRegister(0, ids,0)
     #val2= readRegister(1, ids,0)
-    val= longRead(0, ids,0,0)
+    val= readRegister(0, ids,0)
+    # print("Alarm Value: ",val)
     alarms= {0:"position error overrun", 1:"reverse prohibition limit", 2:"positive prohibition limit", 3:"over temperature", 4:"internal error", 5:"supply voltage out of range", 6:"reserved", 7:"drive overcurrent", 8:"reserved", 9:"motor encodeer not connected",
-             10:"communication exception", 11:"reserved", 12:"vent failure", 13:"motor overload protection", 14:"reserved", 15:"unsuaal start alarm", 16:"input phase loss", 17:"STO", 18:"reserved", 19:"motor speed exceeds limit",
-             20:"drive undervoltage", 21:"emergency stop", 22:"second encoder not connected", 23:"full closed loop deviation overrun", 24:"absolute encoder battery undervoltage", 25:"accurate position lost", 26:"absolute position overflow", 27:"communication interrupt", 28:"abosute encoder multi tuen error", 29:"abnormal motor action protection",
-             30:"EtherCat communication error", 31:"Back to origin parameter configuration error"}
-    '''
-    if val2>0:
-        for i in range(0, 16):
-            if val2 & 2**i == 2**i:
-                error.append(i)
-    if val1>0:
-        for i in range(0, 16):
-            print(i, 2**i, val1&2**i)
-            if val1 & 2**i == 2**i:
-                error.append(i+16)
-    '''
-    error= getBits(val,32)
+             10:"communication exception", 11:"reserved", 12:"vent failure", 13:"motor overload protection", 14:"reserved", 15:"unsuaal start alarm"}
+   
+    error= getBits(val,16)
 
     for i in error:
         print(alarms[i], end= ", ")
         
-    return error
+    return val, error
 
-
+def seekHome():
+    writeRegister(125, 0x34, 1)
+    writeRegister(126, 0x46, 1)
+    writeRegister(124, 0x6e, 1)
+    while True:
+        x,y=getStatus(1)
+        if 10 not in y:
+            break
 
 def resetAlarm():
     writeRegister(124, 186, 1)
-    writeRegister(124, 186, 2)
 
 def brakeStatus(ids):
+
     val= readRegister(4, ids,0)
     #print(ids, val)
     if val & 4 == 4:
@@ -146,21 +142,26 @@ def getEncoder(ids,prev):
     return longRead(4, ids, 0,prev)
 
 def setEncoder(ids, prev):
-    print("setEncoderFunction")
-    pass
+    # print(getEncoder(ids,prev))
+    longWrite(125, prev, ids)
+    longRead(125,1,0,-2000)
+    writeRegister(124, 0x98, ids)
+    # print(getEncoder(ids, prev))
 
-def setPosition(pos,ids):
+def setPosition(pos,speed, ids):
     longWrite(30,pos, ids)
-    writeRegister(124, 0x67, 1)
-    print(longRead(30,1,0,-2000))
+    writeRegister(29,speed,ids)
+    writeRegister(124, 0x66, 1)
+    # print(longRead(30,1,0,-2000))
 
 def getCurrent(ids):
     return longRead(30, ids, 0,0)
 
 def getStatus(ids):
-    val= longRead(2, ids,0,0)
-    lst= getBits(val,32)
-    return lst
+    val= readRegister(1, ids,0)
+    # print("Status Code: ", val)
+    lst= getBits(val,16)
+    return val, lst
 
 
 
