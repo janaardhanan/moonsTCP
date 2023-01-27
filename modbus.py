@@ -69,7 +69,7 @@ def longRead(add, ids, mode, prev):
 def writeRegister(add, val, ids):
     global motor_status
     val= (val+ (1<<16))%(1<<16)
-    print("write register: ", val)
+    # print("write register: ", val)
     rd= mod.write_register(address= add, value= val, unit=ids)
     motor_status=1
 
@@ -128,7 +128,7 @@ def brakeStatus(ids):
         return True
     return False
 
-    
+
 
 def setSpeed(speed, ids):
     # print(hex(two_cmp(speed,16)))
