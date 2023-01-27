@@ -68,6 +68,8 @@ def longRead(add, ids, mode, prev):
 
 def writeRegister(add, val, ids):
     global motor_status
+    val= (val+ (1<<16))%(1<<16)
+    print("write register: ", val)
     rd= mod.write_register(address= add, value= val, unit=ids)
     motor_status=1
 
@@ -84,12 +86,8 @@ def startJog():
     global motor_status
     writeRegister(124, 159, 1)
 
-    if brakeStatus(1) or brakeStatus(2):
-        motor_status=3
-        print("brake engaged, reset alarm")
-    else:
-        writeRegister(124, 150, 1)
-        print("Jog started")
+    writeRegister(124, 150, 1)
+    print("Jog started")
 
 def stopJog():
     writeRegister(124, 226, 1)
@@ -130,13 +128,14 @@ def brakeStatus(ids):
         return True
     return False
 
+    
 
-
-def setSpeed(lspeed, ids):
-    longWrite(342, lspeed, ids)
+def setSpeed(speed, ids):
+    # print(hex(two_cmp(speed,16)))
+    writeRegister(48, speed, ids)
 
 def getSpeed(ids,prev):
-    return longRead(342, ids, 1,prev)
+    return readRegister(48, ids, 0)
 
 def getEncoder(ids,prev):
     return longRead(4, ids, 0,prev)
