@@ -21,7 +21,7 @@ try:
     plc.connect('192.168.0.10',0,1)
     init = True
     print('plc connected')
-    plc.db_write(db, 6, b'0')
+    plc.db_write(db, 6, b'\0')
 except:
     print('Plc disconnected')
     init= False
@@ -30,7 +30,7 @@ modbus.resetAlarm()
 a=0
 
 while init:
-    write_trigger=b'0'
+    write_trigger=b'\0'
     
     try:
         
