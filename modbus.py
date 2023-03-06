@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-from pymodbus.client.sync import ModbusSerialClient as client
+from pymodbus.client.sync import ModbusTcpClient
 from pymodbus.payload import BinaryPayloadDecoder as dec
 from pymodbus.constants import Endian
 import time
@@ -150,7 +150,7 @@ def setEncoder(ids, prev):
 def setPosition(pos,speed, ids):
     longWrite(30,pos, ids)
     writeRegister(29,speed,ids)
-    writeRegister(124, 0x67, 1)
+    writeRegister(124, 0x66, 1)
     # print(longRead(30,1,0,-2000))
 
 def getCurrent(ids):
@@ -164,6 +164,6 @@ def getStatus(ids):
 
 
 
-mod = client(method='rtu', timeout=0.3, parity='N', baudrate=9600,port='/dev/ttyUSB0')
+mod = ModbusTcpClient('192.168.0.140')
 print("Connection status: ",mod.connect())
 time.sleep(0.2)
